@@ -2,7 +2,7 @@
 
 Lecture： 蔡芸琤老師  
 Name ： 余永興  
-Department ： 科技系2年紀
+Department ： 科技系3年紀
 
 ## Class note
 ## Homework area
