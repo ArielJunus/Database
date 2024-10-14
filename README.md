@@ -7,5 +7,6 @@ Department ： 科技系3年紀
 ## Class note
 ## Homework area
 [HW1](https://github.com/ArielJunus/Database/tree/main/myprojectdb)
+[HW1 Vid](https://youtu.be/eW8hcdbOzrw)
 
 ## Final
