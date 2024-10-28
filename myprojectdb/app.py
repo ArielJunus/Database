@@ -1,78 +1,62 @@
-from flask import Flask, render_template, request, redirect
-import mysql.connector
-from mysql.connector import Error
+from flask import Flask, render_template, request, redirect, url_for
+from join import init_db, get_contacts, add_contact, edit_contact, delete_contact, get_contact_by_id
 
 app = Flask(__name__)
 
-# MySQL configurations
+# MySQL Configuration
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'password132'
-app.config['MYSQL_DB'] = 'address'
+app.config['MYSQL_DB'] = 'databook1'
 
-# Initialize the MySQL connection
-def get_db_connection():
-    try:
-        connection = mysql.connector.connect(
-            host=app.config['MYSQL_HOST'],
-            user=app.config['MYSQL_USER'],
-            password=app.config['MYSQL_PASSWORD'],
-            database=app.config['MYSQL_DB']
-        )
-        return connection
-    except Error as e:
-        print(f"Error connecting to MySQL: {e}")
-        return None
-
-# Create the 'addresses' table if it doesn't exist
-def create_table():
-    connection = get_db_connection()
-    if connection is None:
-        print("Failed to create table because connection is None")
-        return
-    cursor = connection.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS addresses (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100),
-            address VARCHAR(255)
-        )
-    ''')
-    connection.commit()
-    cursor.close()
-    connection.close()
+mysql = init_db(app)
 
 @app.route('/')
 def index():
-    # Fetch all addresses from the database
-    connection = get_db_connection()
-    if connection is None:
-        return "Database connection failed!"
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM addresses')
-    addresses = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return render_template('index.html', addresses=addresses)
+    contacts = get_contacts(mysql)
+    return render_template('index.html', contacts=contacts)
 
 @app.route('/add', methods=['POST'])
-def add_address():
-    # Get form data
-    name = request.form['name']
-    address = request.form['address']
-    
-    # Insert the new address into the database
-    connection = get_db_connection()
-    if connection is None:
-        return "Database connection failed!"
-    cursor = connection.cursor()
-    cursor.execute('INSERT INTO addresses (name, address) VALUES (%s, %s)', (name, address))
-    connection.commit()
-    cursor.close()
-    connection.close()
-    
-    return redirect('/')
+def add_contact_route():
+    if request.method == 'POST':
+        name = request.form['name']
+        phone = request.form['phone']
+        email = request.form['email']
+        group_name = request.form['group_name']
+        add_contact(mysql, name, phone, email, group_name)
+        return redirect(url_for('index'))
+
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit_contact_route(id):
+    if request.method == 'POST':
+        name = request.form['name']
+        phone = request.form['phone']
+        email = request.form['email']
+        group_name = request.form['group_name']
+        edit_contact(mysql, id, name, phone, email, group_name)
+        return redirect(url_for('index'))
+
+    contact = get_contact_by_id(mysql, id)  # Fetching a single contact by ID
+    if contact:
+        return render_template('edit.html', contact=contact)
+    else:
+        return "Contact not found", 404
+
+@app.route('/delete/<int:id>', methods=['GET'])
+def delete_contact_route(id):
+    delete_contact(mysql, id)
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    create_table()  # Create the table when starting the app
     app.run(debug=True)
+
+
+
+
+
+
+
+
+
+
+
