@@ -44,13 +44,13 @@
             <tbody>
                 {% for contact in contacts %}
                 <tr>
-                    <td>{{ contact[1] }}</td> <!-- Name -->
-                    <td>{{ contact[2] }}</td> <!-- Phone -->
-                    <td>{{ contact[3] }}</td> <!-- Email -->
-                    <td>{{ contact[4] }}</td> <!-- Group -->
+                    <td>{{ contact['name'] }}</td>
+                    <td>{{ contact['phone'] }}</td>
+                    <td>{{ contact['email'] }}</td>
+                    <td>{{ contact['group_name'] }}</td>
                     <td>
-                        <a href="/edit/{{ contact[0] }}" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="/delete/{{ contact[0] }}" class="btn btn-danger btn-sm">Delete</a>
+                        <a href="/edit/{{ contact['_id'] }}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="/delete/{{ contact['_id'] }}" class="btn btn-danger btn-sm">Delete</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -63,6 +63,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
 
 
 

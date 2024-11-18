@@ -1,63 +1,51 @@
-from flask_mysqldb import MySQL
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 
-def init_db(app):
-    mysql = MySQL(app)
-    return mysql
+def init_db():
+    client = MongoClient('localhost', 27017)
+    db = client.flask_database
+    return db
 
-def get_contacts(mysql):
-    cur = mysql.connection.cursor()
-    # Join contacts with phone_info and email_info to fetch all details
-    cur.execute("""
-        SELECT contacts.id, contacts.name, phone_info.phone, email_info.email, contacts.group_name
-        FROM contacts
-        LEFT JOIN phone_info ON contacts.id = phone_info.contact_id
-        LEFT JOIN email_info ON contacts.id = email_info.contact_id
-    """)
-    contacts = cur.fetchall()
-    cur.close()
+def get_contacts(db):
+    contacts_collection = db['contacts']
+    # Retrieve all contacts as a list of dictionaries
+    contacts = list(contacts_collection.find({}))
     return contacts
 
-def get_contact_by_id(mysql, id):
-    cur = mysql.connection.cursor()
-    cur.execute("""
-        SELECT contacts.id, contacts.name, phone_info.phone, email_info.email, contacts.group_name
-        FROM contacts
-        LEFT JOIN phone_info ON contacts.id = phone_info.contact_id
-        LEFT JOIN email_info ON contacts.id = email_info.contact_id
-        WHERE contacts.id = %s
-    """, (id,))
-    contact = cur.fetchone()  # fetch one record
-    cur.close()
+def get_contact_by_id(db, contact_id):
+    contacts_collection = db['contacts']
+    # Retrieve a single contact by its ID
+    contact = contacts_collection.find_one({"_id": contact_id})
     return contact
 
-def add_contact(mysql, name, phone, email, group_name):
-    cur = mysql.connection.cursor()
-    # Insert into contacts table first
-    cur.execute("INSERT INTO contacts (name, group_name) VALUES (%s, %s)", (name, group_name))
-    contact_id = cur.lastrowid
-    
-    # Insert into phone_info and email_info with the new contact_id
-    cur.execute("INSERT INTO phone_info (contact_id, phone) VALUES (%s, %s)", (contact_id, phone))
-    cur.execute("INSERT INTO email_info (contact_id, email) VALUES (%s, %s)", (contact_id, email))
-    mysql.connection.commit()
-    cur.close()
+def add_contact(db, name, phone, email, group_name):
+    contacts_collection = db['contacts']
+    # Insert a new contact into the collection
+    contacts_collection.insert_one({
+        "name": name,
+        "phone": phone,
+        "email": email,
+        "group_name": group_name
+    })
 
-def edit_contact(mysql, id, name, phone, email, group_name):
-    cur = mysql.connection.cursor()
-    # Update contacts table
-    cur.execute("UPDATE contacts SET name=%s, group_name=%s WHERE id=%s", (name, group_name, id))
-    
-    # Update phone_info and email_info tables
-    cur.execute("UPDATE phone_info SET phone=%s WHERE contact_id=%s", (phone, id))
-    cur.execute("UPDATE email_info SET email=%s WHERE contact_id=%s", (email, id))
-    mysql.connection.commit()
-    cur.close()
+def edit_contact(db, contact_id, name, phone, email, group_name):
+    contacts_collection = db['contacts']
+    # Update an existing contact by its ID
+    contacts_collection.update_one(
+        {"_id": contact_id},
+        {"$set": {
+            "name": name,
+            "phone": phone,
+            "email": email,
+            "group_name": group_name
+        }}
+    )
 
-def delete_contact(mysql, id):
-    cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM contacts WHERE id=%s", (id,))
-    mysql.connection.commit()
-    cur.close()
+def delete_contact(db, contact_id):
+    contacts_collection = db['contacts']
+    # Delete a contact by its ID
+    contacts_collection.delete_one({"_id": contact_id})
+
 
 
 
