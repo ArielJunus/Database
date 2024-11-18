@@ -13,4 +13,8 @@ Department ： 科技系3年紀
 
 [HW2 Vid](https://youtu.be/qWEGLuaXde8)
 
+[HW3](https://github.com/ArielJunus/Database/tree/main/myprojectdb) 
+
+[HW3 Vid](https://youtu.be/s701m5mxgY4)
+
 ## Final
