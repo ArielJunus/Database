@@ -17,4 +17,8 @@ Department ： 科技系3年紀
 
 [HW3 Vid](https://youtu.be/s701m5mxgY4)
 
+[HW4 Vid](https://youtu.be/ANK7JwaDcpc)
+
+HW4 code the same as HW3 :D
+
 ## Final
