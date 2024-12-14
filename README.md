@@ -21,4 +21,8 @@ Department ： 科技系3年紀
 
 HW4 code the same as HW3 :D
 
+[Final Project](https://github.com/ArielJunus/Database/tree/main/database_finalpro)
+
+[Final Project Vid](https://youtu.be/DnNI2DO44EI)
+
 ## Final
